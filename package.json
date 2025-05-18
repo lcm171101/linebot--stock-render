@@ -1,8 +1,7 @@
 
 {
-  "name": "line-bot-render",
+  "name": "line-stock-bot",
   "version": "1.0.0",
-  "description": "LINE Bot for Render",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
