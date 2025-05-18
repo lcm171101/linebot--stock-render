@@ -2,13 +2,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const { appendStockData } = require('./google-sheet.service');
 const app = express();
 app.use(bodyParser.json());
 
 const LINE_TOKEN = process.env.LINE_TOKEN;
 const USER_ID = process.env.USER_ID;
 
-// Webhook 回覆
 app.post('/callback', async (req, res) => {
   const event = req.body.events?.[0];
   if (event && event.type === 'message') {
@@ -29,12 +29,15 @@ app.post('/callback', async (req, res) => {
   res.sendStatus(200);
 });
 
-// /push：每日分析推播（模擬內容）
 app.get('/push', async (req, res) => {
-  const msg = `【IC 類股速報】
-台積電 924 元（+2.3%）PER: 20.3 → 可考慮買進
-聯發科 1285 元（-3.1%）PER: 19.2 → 法人出貨警示
-報表：https://your-report-link`;
+  const rows = [
+    [ "2025-05-18", "台積電", "2330", 924, "+4.0", "2.3%", 25302, 20.3, 67.4, 78.5, "多頭", "買進", "法人進場" ]
+  ];
+  await appendStockData(rows);
+
+  const msg = `【IC 類股推播】
+台積電 924 元（+2.3%）PER: 20.3 → 法人進場訊號
+📋 報表：https://docs.google.com/spreadsheets/d/1RK9uzltVKRxeKfVyZS_I8eq564-JfKfanNCyi1vFvG0`;
 
   await axios.post('https://api.line.me/v2/bot/message/push', {
     to: USER_ID,
@@ -46,12 +49,11 @@ app.get('/push', async (req, res) => {
     },
   });
 
-  res.send('Push sent.');
+  res.send('Push sent and data written to Google Sheet.');
 });
 
-// 基本測試
 app.get('/', (req, res) => {
-  res.send('LINE Stock Bot is running.');
+  res.send('LINE Bot with Google Sheets is running.');
 });
 
 const port = process.env.PORT || 3000;
