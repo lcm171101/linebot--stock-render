@@ -17,7 +17,7 @@ async function appendStockData(rows) {
     spreadsheetId: SHEET_ID,
     range: '工作表1!A1',
     valueInputOption: 'USER_ENTERED',
-    requestBody: { values: rows },
+    requestBody: { values: rows }
   });
 }
 
