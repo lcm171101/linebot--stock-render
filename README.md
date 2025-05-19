@@ -1,24 +1,77 @@
-# Deploy LINE Bot NodeJS Examples on Render
 
-This repo can be used to deploy nodejs examples in the [line-bot-sdk-nodejs](https://github.com/line/line-bot-sdk-nodejs/tree/master/examples) on [Render](https://render.com/).
-## Prerequisites
-Make sure you have the following:
-- A dedicated [Messaging API channel](https://developers.line.biz/en/docs/messaging-api/getting-started/) for your bot.
-- A [Render account](https://dashboard.render.com/register) that doesn't require credit card to sign up.
+# 📊 LINE Bot 群組推播系統：IC 類股技術分析
 
-## Deployment
-1. Fork this repo.
-2. Update `render.yaml` to comment/uncomment the services of LINE bot examples you want to deploy.
-3. Cieck to deploy
-   
-   [![Deploy to Render](http://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+這是一個 Node.js 應用程式，會從 Yahoo 股市自動擷取台灣上市 IC 類股（如台積電、聯電、鴻海）的即時股價資訊，並模擬技術分析（RSI、KD、MACD、法人買超）後，將推播訊息傳送至指定的 LINE 群組。
 
-4. You will be prompted to input LINE channel secret and [access token](https://developers.line.biz/en/docs/messaging-api/channel-access-tokens/). You can find them on the [LINE Developers Console](https://developers.line.biz/console/). Channel secret is on the channel's `Basic settings` tab. Channel access token is on the channel's `Messaging API` tab.
-5. Once the bot servcie is live, find the service `onrender` URL (e.g., `https://line-bot-nodejs-<something unique>.onrender.com`) on the Dashboard. Append `/callback` to the service URL to build the webhook URL (e.g., `https://line-bot-nodejs-<something unique>.onrender.com/callback`). Paste the webhook URL to the `Webhook settings` section on the LINE channel's `Messaging API` tab on the [LINE Developers Console](https://developers.line.biz/console/). Also enable `Use webhook` on the same section.
-   > For the `line-bot-nodejs-echo-ts` example, the webhook URL is `https://line-bot-nodejs-<something unique>.onrender.com/webhook`
-7. Add the LINE Official Account associated with your bot as a friend on LINE by scanning the QR code on the `Messaging API` tab of your channel settings on the [LINE Developers Console](https://developers.line.biz/console/).
-8. That's it. Send your LINE Official Account a text message on LINE and confirm that it responds with the same message.
+## 🚀 功能特色
 
-## Notes
-- If your LINE bot app files are in the same repo as `render.yaml`, you don't need to specify `repo` in the `render.yaml`. You can find more information in the [Render Blueprint spec](https://render.com/docs/blueprint-spec#repo--branch).
-- If you copy the [kitchensink example files](https://github.com/line/line-bot-sdk-nodejs/tree/next/examples/kitchensink) to your repo, remember to update the `@line/bot-sdk` dependency in the `package.json` from local to npm. 
+- ✅ 擷取即時股價、漲跌幅
+- ✅ 模擬技術指標（RSI、KD、MACD）
+- ✅ 模擬外資買賣超分析
+- ✅ 自動推播至指定 LINE 群組
+- ✅ 不依賴 Google Sheets 或資料庫，完全靠網路擷取 + 運算
+
+## 📦 安裝與部署
+
+### ✅ 1. 安裝套件
+
+```bash
+npm install
+```
+
+### ✅ 2. 設定環境變數（.env 或 Render 上設定）
+
+| 變數名稱        | 說明 |
+|----------------|------|
+| `LINE_TOKEN`   | 你的 LINE Bot Channel Access Token |
+| `LINE_GROUP_ID`| 你要推播的 LINE 群組 ID（例如：`Cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`）|
+
+### ✅ 3. 啟動伺服器
+
+```bash
+node index.js
+```
+
+## ✉️ 測試推播
+
+啟動後，請在瀏覽器或 API 工具中打開以下網址：
+
+```
+GET /push
+```
+
+範例（若在 Render 部署）：
+
+```
+https://your-app.onrender.com/push
+```
+
+成功後：
+- 畫面會顯示：`已推播至指定群組`
+- 群組會收到包含分析結果的訊息
+
+## 🧠 推播格式範例
+
+```
+【IC 類股技術分析（群組推播）】
+
+台積電 924（+4.0）→ 可考慮買進
+📈 指標：RSI 72、K=80 D=65、MACD=多頭趨勢
+📊 法人：外資買賣超 1200 張
+📌 評估：RSI 超買、黃金交叉、外資大買
+```
+
+## 🛠 技術架構
+
+- Node.js + Express
+- Axios + Cheerio 擷取網頁資料
+- LINE Messaging API 推播訊息
+
+## 📎 備註
+
+- `RSI/KD/MACD/法人` 為模擬隨機邏輯，如需真實數據請搭配歷史資料庫或 API。
+- 群組 ID 需從 LINE Bot 被加入群組後觸發 `/callback` 並讀取 Logs 取得。
+
+## 📜 授權
+
+MIT License
