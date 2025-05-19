@@ -12,14 +12,19 @@ const LINE_GROUP_ID = process.env.LINE_GROUP_ID;
 
 async function fetchYahooStockData(stockId) {
   const url = `https://tw.stock.yahoo.com/quote/${stockId}.TW`;
-  const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  const $ = cheerio.load(res.data);
+  try {
+    const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const $ = cheerio.load(res.data);
 
-  const name = $('h1.D\(ib\).Fz\(18px\)').text().trim();
-  const price = $('span.Fw\(b\).Fz\(36px\)').text().trim();
-  const change = $('span.Fz\(24px\).Fw\(600\)').first().text().trim();
+    const name = $('h1').first().text().trim() || "N/A";
+    const price = $('span:contains("元")').first().text().trim() || "N/A";
+    const change = $('span:contains("+"), span:contains("-")').first().text().trim() || "N/A";
 
-  return { stockId, name, price, change };
+    return { stockId, name, price, change };
+  } catch (err) {
+    console.log("Yahoo 擷取失敗:", err.message);
+    return { stockId, name: "取得失敗", price: "-", change: "-" };
+  }
 }
 
 function generateAnalysis(stockId, name, price, change) {
@@ -72,8 +77,8 @@ app.get('/push', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('LINE 群組推播版運行中');
+  res.send('LINE 群組推播（安全選擇器）運行中');
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log('群組推播服務運行中...'));
+app.listen(port, () => console.log('群組推播服務已啟動'));
