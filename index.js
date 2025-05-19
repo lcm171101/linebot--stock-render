@@ -3,7 +3,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { appendStockData } = require('./google-sheet.service');
 
 const app = express();
 app.use(bodyParser.json());
@@ -11,51 +10,62 @@ app.use(bodyParser.json());
 const LINE_TOKEN = process.env.LINE_TOKEN;
 const USER_ID = process.env.USER_ID;
 
-// Yahoo 股價爬蟲（基本資料）
 async function fetchYahooStockData(stockId) {
   const url = `https://tw.stock.yahoo.com/quote/${stockId}.TW`;
   const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
   const $ = cheerio.load(res.data);
 
-  const name = $('h1.D\(ib\).Fz\(18px\)').text();
-  const price = $('span.Fw\(b\).Fz\(36px\)').text();
-  const change = $('span.Fz\(24px\).Fw\(600\)').first().text();
+  const name = $('h1.D\(ib\).Fz\(18px\)').text().trim();
+  const price = $('span.Fw\(b\).Fz\(36px\)').text().trim();
+  const change = $('span.Fz\(24px\).Fw\(600\)').first().text().trim();
+
   return { stockId, name, price, change };
 }
 
-// 模擬技術指標資料
-function mockAnalysis(stockId, name, price, change) {
-  return [
-    new Date().toISOString().split('T')[0],
-    stockId, name, price, change, "2.3%", 25302, 20.3,
-    920, 910, 905, "2.1%", 67.4, 78.5, 75.3, 1.2, 0.8,
-    880, 950, 1200, 300, 100, 1600,
-    "法人進場", "放量上漲", "買進", "10.2%", "9.3%"
-  ];
+// 模擬技術分析邏輯
+function generateAnalysis(stockId, name, price, change) {
+  // 假設模擬資料（可改為真實計算）
+  const rsi = Math.floor(Math.random() * 50) + 30; // 30~80
+  const k = Math.floor(Math.random() * 80);
+  const d = Math.floor(Math.random() * 80);
+  const macd = Math.random() > 0.5 ? "多頭趨勢" : "空頭趨勢";
+  const foreignBuy = Math.floor(Math.random() * 3000 - 1500); // -1500~1500
+
+  const signals = [];
+  if (rsi > 70) signals.push("RSI 超買");
+  else if (rsi < 30) signals.push("RSI 超賣");
+
+  if (k > d + 10) signals.push("黃金交叉");
+  else if (d > k + 10) signals.push("死亡交叉");
+
+  signals.push(macd);
+
+  if (foreignBuy > 1000) signals.push("外資大買");
+  else if (foreignBuy < -1000) signals.push("外資大賣");
+
+  const suggestion = signals.includes("黃金交叉") && foreignBuy > 0 ? "可考慮買進" : "觀望";
+
+  return `${name} ${price}（${change}）→ ${suggestion}
+📈 指標：RSI ${rsi}、K=${k} D=${d}、MACD=${macd}
+📊 法人：外資買賣超 ${foreignBuy} 張
+📌 評估：${signals.join("、")}`;
 }
 
 app.get('/push', async (req, res) => {
-  const stocks = ["2330", "2303", "2317"];
-  const rows = [];
-  let message = "【IC 技術分析摘要】\n";
+  const stockIds = ["2330", "2303", "2317"];
+  const messages = [];
 
-  for (const id of stocks) {
+  for (const id of stockIds) {
     const info = await fetchYahooStockData(id);
-    const row = mockAnalysis(info.stockId, info.name, info.price, info.change);
-    rows.push(row);
-    message += `${info.name} ${info.price}（${info.change}）→ ${row[26]}\n`;
+    const analysis = generateAnalysis(info.stockId, info.name, info.price, info.change);
+    messages.push(analysis);
   }
 
-  await appendStockData(rows);
+  const text = `【IC 類股技術分析】\n\n` + messages.join("\n\n");
 
   await axios.post("https://api.line.me/v2/bot/message/push", {
     to: USER_ID,
-    messages: [
-      {
-        type: "text",
-        text: message + "\n📋 報表：https://docs.google.com/spreadsheets/d/1RK9uzltVKRxeKfVyZS_I8eq564-JfKfanNCyi1vFvG0"
-      }
-    ]
+    messages: [{ type: 'text', text }]
   }, {
     headers: {
       Authorization: `Bearer ${LINE_TOKEN}`,
@@ -63,12 +73,12 @@ app.get('/push', async (req, res) => {
     }
   });
 
-  res.send("分析推播完成並寫入 Sheets");
+  res.send("技術分析推播完成");
 });
 
 app.get('/', (req, res) => {
-  res.send('LINE Bot with Technical Indicator Integration');
+  res.send('LINE Bot 技術分析版運行中');
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Running..."));
+app.listen(port, () => console.log('Server running...'));
