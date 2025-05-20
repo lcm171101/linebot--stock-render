@@ -1,6 +1,6 @@
 
 {
-  "name": "line-bot-show-groupid",
+  "name": "line-bot-broadcast-on-demand",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,6 @@
   "dependencies": {
     "axios": "^1.6.0",
     "body-parser": "^1.20.2",
-    "cheerio": "^1.0.0",
     "express": "^4.18.2"
   }
 }
