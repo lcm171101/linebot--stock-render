@@ -10,6 +10,19 @@ app.use(bodyParser.json());
 
 const LINE_TOKEN = process.env.LINE_TOKEN;
 
+// 自動建立空白 JSON 檔案（如果不存在）
+function ensureFileExists(file) {
+  const filePath = path.resolve(__dirname, file);
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, '[]', 'utf8');
+    console.log(`🆕 已建立 ${file}`);
+  }
+}
+
+// 啟動時確保 JSON 檔存在
+ensureFileExists('userIds.json');
+ensureFileExists('groupIds.json');
+
 // 儲存使用者或群組 ID
 function saveId(type, id) {
   const filePath = path.resolve(__dirname, `${type}Ids.json`);
