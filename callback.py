@@ -1,9 +1,10 @@
 
 from fastapi import APIRouter, Request
+from firebase_util import init_firestore
 from firebase_admin import firestore
 
 router = APIRouter()
-db = firestore.client()
+db = init_firestore()
 
 @router.post("/callback")
 async def line_callback(request: Request):
