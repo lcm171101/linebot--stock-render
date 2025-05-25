@@ -14,3 +14,6 @@ app.include_router(callback_router)
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("stocks.html", {"request": request, "stocks": get_stock_data(db)})
+
+from push import push_router
+app.include_router(push_router)
