@@ -2,7 +2,4 @@
 fastapi
 uvicorn
 jinja2
-requests
-beautifulsoup4
 firebase-admin
-finmind
