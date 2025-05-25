@@ -6,7 +6,6 @@ from finmind.data import DataLoader
 
 def analyze_stock(stock_id):
     result = {"id": stock_id}
-
     loader = DataLoader()
     data = loader.taiwan_stock_indicator(
         stock_id=stock_id,
@@ -15,7 +14,6 @@ def analyze_stock(stock_id):
     if data.empty:
         result["error"] = "No indicator data"
         return result
-
     last = data.iloc[-1]
     result.update({
         "RSI14": last.get("RSI14"),
@@ -27,7 +25,6 @@ def analyze_stock(stock_id):
         "MA20": last.get("MA20"),
         "MA60": last.get("MA60"),
     })
-
     try:
         url = f"https://goodinfo.tw/tw/StockFinDetail.asp?RPT_CAT=PER&STOCK_ID={stock_id}"
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -36,7 +33,6 @@ def analyze_stock(stock_id):
         result["PE"] = pe.text if pe else "N/A"
     except Exception:
         result["PE"] = "N/A"
-
     result["time"] = datetime.now().isoformat()
     return result
 
