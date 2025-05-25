@@ -3,13 +3,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from firebase_util import init_firestore, get_stock_data
+from analyzer import analyze_all_stocks
 from callback import router as callback_router
 from push import push_router
-from analyzer import analyze_all_stocks
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
 db = init_firestore()
 
 app.include_router(callback_router)
