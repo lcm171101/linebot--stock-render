@@ -6,7 +6,6 @@ from firebase_admin import credentials, firestore, initialize_app, get_app
 
 def init_firestore():
     try:
-        # 檢查是否已初始化過 Firebase
         get_app()
     except ValueError:
         encoded = os.getenv("FIREBASE_KEY_B64")

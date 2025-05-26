@@ -7,10 +7,7 @@ from finmind.data import DataLoader
 def analyze_stock(stock_id):
     result = {"id": stock_id}
     loader = DataLoader()
-    data = loader.taiwan_stock_indicator(
-        stock_id=stock_id,
-        start_date="2024-01-01"
-    )
+    data = loader.taiwan_stock_indicator(stock_id=stock_id, start_date="2024-01-01")
     if data.empty:
         result["error"] = "No indicator data"
         return result

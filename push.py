@@ -17,7 +17,7 @@ async def push_all():
         user_id = doc.id
         body = {
             "to": user_id,
-            "messages": [{"type": "text", "text": "📢 股票分析訊息通知（測試）"}]
+            "messages": [{"type": "text", "text": "📢 技術指標分析通知（已更新）"}]
         }
         headers = {
             "Authorization": f"Bearer {token}",
