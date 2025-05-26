@@ -4,3 +4,4 @@ jinja2
 firebase-admin
 requests
 beautifulsoup4
+finmind
