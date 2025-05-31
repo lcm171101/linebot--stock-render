@@ -19,12 +19,24 @@ app.get('/', async (req, res) => {
   <body class="p-4">
     <h2>📊 股票分析結果</h2>
     <table class="table table-bordered table-striped">
-      <thead><tr><th>股票代號</th><th>目前本益比</th><th>RSI</th><th>MACD</th><th>更新時間</th></tr></thead>
+      <thead><tr>
+        <th>股票代號</th>
+        <th>目前本益比</th>
+        <th>15年平均</th>
+        <th>15年最高</th>
+        <th>15年最低</th>
+        <th>RSI</th>
+        <th>MACD</th>
+        <th>更新時間</th>
+      </tr></thead>
       <tbody>
         ${data.map(d => `
           <tr>
             <td>${d.stockId}</td>
             <td>${d.pe.current}</td>
+            <td>${d.pe.avg15y}</td>
+            <td>${d.pe.max15y}</td>
+            <td>${d.pe.min15y}</td>
             <td>${d.tech.RSI14}</td>
             <td>${d.tech.MACD_DIF}</td>
             <td>${d.timestamp}</td>
