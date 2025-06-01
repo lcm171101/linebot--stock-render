@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('./firebase');
 const { analyzeStock } = require('./analyzer');
-const cron = require('node-cron');
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,6 +27,11 @@ async function analyzeAll() {
   }
   console.log("✅ 股票分析完成");
 }
+
+app.get('/cron-analyze', async (req, res) => {
+  await analyzeAll();
+  res.send('✅ 外部排程觸發分析完成');
+});
 
 app.get('/stocks/list', async (req, res) => {
   const list = await getStockList();
@@ -80,8 +84,6 @@ app.get('/analyze', async (req, res) => {
   await analyzeAll();
   res.redirect('/');
 });
-
-cron.schedule('0 1 * * *', analyzeAll);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
